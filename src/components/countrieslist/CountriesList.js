@@ -1,36 +1,21 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { NavLink } from 'react-router-dom';
 
-import './CountriesList.css';
-
-function CountriesList(props) {
-  const [state, setState] = useState({ activeItem: -1 });
-
-  const handleClick = (index) => {
-    setState({ activeItem: index });
-  };
-
+function CountryList(props) {
   return (
-    <div className="col-4 countrieslist">
-      <ul className="list-group">
-        {props.countries.map((country, i) => (
-          <li key={i}>
-            <Link
-              className={
-                state.activeItem === i
-                  ? 'list-group-item list-group-item-action border-primary font-weight-bold active'
-                  : 'list-group-item list-group-item-action border-primary font-weight-bold text-primary'
-              }
-              to={`/countries/${country.cca3}`}
-              onClick={handleClick.bind(this, i)}
-            >
-              <strong>{country.flag}</strong> {country.name.common}
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <div className="list-group">
+      {props.countries.map((country) => (
+        <NavLink
+          key={country.cca3}
+          className="list-group-item list-group-item-action"
+          activeClassName="active"
+          to={`/country/${country.cca3}`}
+        >
+          <span>{country.flag}</span> {country.name.common}
+        </NavLink>
+      ))}
     </div>
   );
 }
 
-export default CountriesList;
+export default CountryList;

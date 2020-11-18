@@ -1,90 +1,78 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
-import countries from '../../countries.json';
-import './CountryDetails.css';
-
-function CountryDetails(props) {
-  const [state, setState] = useState({
-    name: {},
-    flag: '',
-    cca2: '',
+class CountryDetail extends React.Component {
+  state = {
+    name: '',
     capital: '',
-    area: '',
-    region: '',
-    subregion: '',
+    area: 0,
     borders: [],
-    languages: {},
-  });
+  };
 
-  useEffect(() => {
-    countries.forEach((country) => {
-      if (country.cca3 === props.match.params.country) {
-        setState(country);
+  componentDidUpdate(prevProps) {
+    if (prevProps.match.params.cca3 !== this.props.match.params.cca3) {
+      const foundCountry = this.props.countries.find((country) => {
+        return country.cca3 === this.props.match.params.cca3;
+      });
+
+      if (foundCountry) {
+        this.setState({
+          name: foundCountry.name.common,
+          capital: foundCountry.capital,
+          area: foundCountry.area,
+          borders: foundCountry.borders,
+        });
       }
-    });
-  }, [props]);
-
-  function renderName(code) {
-    let country = countries.find((elem) => elem.cca3 === code);
-    return `${country.name.common}`;
+    }
   }
 
-  return (
-    <div className="col-7">
-      <h1 className="text-primary">
-        {state.flag} {state.name.common} - {state.cca2}
-      </h1>
-      <table className="table">
-        <thead></thead>
-        <tbody>
-          <tr>
-            <td className="tabledata text-primary font-weight-bold">Capital</td>
-            <td>{state.capital}</td>
-          </tr>
-          <tr>
-            <td className="text-primary font-weight-bold">Region</td>
-            <td>{state.region}</td>
-          </tr>
-          <tr>
-            <td className="text-primary font-weight-bold">Subregion</td>
-            <td>{state.subregion}</td>
-          </tr>
-          <tr>
-            <td className="text-primary font-weight-bold">Languages</td>
-            <td>
-              <ul className="list-unstyled">
-                {Object.values(state.languages).map((elem, idx) => (
-                  <li key={-idx}>{elem}</li>
-                ))}
-              </ul>
-            </td>
-          </tr>
-          <tr>
-            <td className="text-primary font-weight-bold">Area</td>
-            <td>
-              {state.area} km
-              <sup>2</sup>
-            </td>
-          </tr>
-          <tr>
-            <td className="text-primary font-weight-bold">Borders</td>
-            <td>
-              <ul>
-                {state.borders.map((country, idx) => (
-                  <li key={idx}>
-                    <Link to={`/countries/${country}`}>
-                      {renderName(country)}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  );
+  renderBorderName = (cca3) => {
+    const foundCountry = this.props.countries.find((country) => {
+      return country.cca3 === cca3;
+    });
+
+    if (foundCountry) {
+      return foundCountry.name.common;
+    } else {
+      return `NAME NOT FOUND`;
+    }
+  };
+
+  render() {
+    return (
+      <div>
+        <h1>{this.state.name}</h1>
+        <table class="table">
+          <thead></thead>
+          <tbody>
+            <tr>
+              <td style={{ width: '30%' }}>Capital</td>
+              <td>{this.state.capital}</td>
+            </tr>
+            <tr>
+              <td>Area</td>
+              <td>
+                {this.state.area} km
+                <sup>2</sup>
+              </td>
+            </tr>
+            <tr>
+              <td>Borders</td>
+              <td>
+                <ul>
+                  {this.state.borders.map((border, idx) => (
+                    <li key={idx}>
+                      <Link to={border}>{this.renderBorderName(border)}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    );
+  }
 }
 
-export default CountryDetails;
+export default CountryDetail;
